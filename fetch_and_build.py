@@ -15,7 +15,7 @@ BOTS = [
     "Sooraj_Kumar_P_S"
 ]
 
-OUTPUT_PGN = "filtered_960_bots_2200plus.pgn"
+OUTPUT_PGN = "filtered_standard_bots_2200plus.pgn"
 
 def fetch_full_games(bot):
     url = f"https://lichess.org/api/games/user/{bot}"
@@ -31,7 +31,6 @@ def fetch_full_games(bot):
             "max": 3000,
             "variant": "standard",
             "perfType": "standard",
-            "vs": ",".join(BOTS),
             "rated": "true",
             "analysed": "false",
             "opening": "false",
@@ -48,6 +47,8 @@ def fetch_full_games(bot):
             break
 
         text = response.text.strip()
+        print(f"  Fetched {len(text)} characters for {bot}")
+
         if not text:
             break
 
@@ -58,7 +59,7 @@ def fetch_full_games(bot):
             break
         until = next_until
 
-        time.sleep(2)  # rate limit
+        time.sleep(2)  
 
     return all_pgn
 
@@ -69,10 +70,11 @@ def filter_games(pgn_data):
     for game in games:
         lines = game.split("\n")
         tags = {line.split(" ")[0][1:]: line for line in lines if line.startswith("[")}
-        # Change the filter to keep only standard games
-        if "[Variant \"Standard\"]" not in tags.get("Variant", "") and "[Variant \"standard\"]" not in tags.get("Variant", ""):
-            # Some PGNs may omit the Variant tag or use capitalized form "Standard"
+        
+        variant_tag = tags.get("Variant", "")
+        if variant_tag and variant_tag.lower() != "standard":
             continue
+        
         w_rating_line = tags.get("WhiteElo", "")
         b_rating_line = tags.get("BlackElo", "")
         w_prov = "WhiteRatingDiff" not in tags
