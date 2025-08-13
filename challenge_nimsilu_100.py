@@ -30,9 +30,9 @@ def challenge_nimsilu():
         response = requests.post(url, headers=headers, json=payload)
 
         if response.status_code == 200:
-            print(f"  ✅ Challenge {i} sent.")
+            print(f"   Challenge {i} sent.")
         else:
-            print(f"  ❌ Challenge {i} failed! Status: {response.status_code} | {response.text}")
+            print(f"   Challenge {i} failed! Status: {response.status_code} | {response.text}")
 
         time.sleep(SLEEP_BETWEEN)
 
