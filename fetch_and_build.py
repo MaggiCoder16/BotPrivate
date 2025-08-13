@@ -44,6 +44,8 @@ def fetch_games_for_bot(bot_name, max_games, min_rating):
             game = chess.pgn.read_game(game_io)
         except:
             continue
+        if game is None:
+            continue
         white_elo = game.headers.get("WhiteElo")
         black_elo = game.headers.get("BlackElo")
         if white_elo is None or black_elo is None:
