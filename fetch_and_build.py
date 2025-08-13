@@ -2,15 +2,6 @@ import requests
 import time
 
 BOTS = [
-    "NimsiluBot",
-    "MaggiChess16",
-    "NNUE_Drift",
-    "Endogenetic-Bot",
-    "Exogenetic-Bot",
-    "InvinxibleFlxsh",
-    "NecroMindX",
-    "Classic_BOT-v2",
-    "BOT_Stockfish13",
     "IndianGuyPlayz",
     "Sooraj_Kumar_P_S"
 ]
