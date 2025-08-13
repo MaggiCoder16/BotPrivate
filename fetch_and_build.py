@@ -31,6 +31,7 @@ def fetch_games_for_bot(bot_name, max_games, min_rating):
         response = requests.get(url, headers=headers, params=params, timeout=60)
         response.raise_for_status()
     except:
+        print(f"Failed to fetch games for {bot_name}")
         return []
 
     pgn_text = response.text
@@ -60,6 +61,7 @@ def fetch_games_for_bot(bot_name, max_games, min_rating):
         if game.headers.get("Black") == bot_name and black_elo < min_rating:
             continue
         filtered_games.append(game_str.strip())
+    print(f"{bot_name}: fetched {len(games)} games, filtered {len(filtered_games)} games above rating {min_rating}")
     return filtered_games
 
 def main():
@@ -67,11 +69,13 @@ def main():
     for bot in BOTS:
         bot_games = fetch_games_for_bot(bot, max_per_bot, MIN_RATING)
         all_games.extend(bot_games)
+        print(f"Total games collected so far: {len(all_games)}")
         time.sleep(1)
         if len(all_games) >= MAX_GAMES_TOTAL:
             break
     with open(OUTPUT_PGN, "w", encoding="utf-8") as f:
         f.write("\n\n\n".join(all_games[:MAX_GAMES_TOTAL]))
+    print(f"Finished. Total games saved: {len(all_games[:MAX_GAMES_TOTAL])}")
 
 if __name__ == "__main__":
     main()
