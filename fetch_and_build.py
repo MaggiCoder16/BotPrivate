@@ -22,7 +22,6 @@ MIN_RATING = 3050
 MIN_MOVES = 10
 DUPLICATE_PLY = 12
 OUTPUT_PGN = "fetched_games.pgn"
-
 max_per_bot = MAX_GAMES_TOTAL // len(BOTS)
 
 def game_starting_moves(game, max_ply):
@@ -56,7 +55,7 @@ def remove_comments_and_variations(game):
     return game.accept(exporter)
 
 def fetch_and_filter_games(bot_name, max_games, seen_openings):
-    headers = {"Accept": "application/x-chess-pgn"}
+    headers = {"Accept": "application/x-chess-pgn", "User-Agent": "Mozilla/5.0"}
     params = {"max": max_games * 4, "rated": "both", "perfType": "classical"}
     url = f"https://lichess.org/api/games/user/{bot_name}"
     try:
