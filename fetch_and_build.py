@@ -1,58 +1,51 @@
 import requests
 import time
+import os
 
 BOTS = [
+    "NimsiluBot",
+    "MaggiChess16",
+    "NNUE_Drift",
+    "Endogenetic-Bot",
+    "Exogenetic-Bot",
+    "InvinxibleFlxsh",
+    "NecroMindX",
+    "Classic_BOT-v2",
+    "BOT_Stockfish13",
     "IndianGuyPlayz",
     "Sooraj_Kumar_P_S"
 ]
 
 OUTPUT_PGN = "filtered_960_bots_2200plus.pgn"
 
+def is_valid_line(line):
+    return line.startswith("[Event") or line.startswith("[Site") or line.startswith("[Date") or line.startswith("[Round") or line.startswith("[White") or line.startswith("[Black") or line.startswith("[Result") or line.startswith("[FEN") or line.startswith("[SetUp") or line.startswith("1.") or line == ""
+
 def fetch_full_games(bot):
     url = f"https://lichess.org/api/games/user/{bot}"
     headers = {
         "Accept": "application/x-chess-pgn"
     }
-    
-    all_pgn = ""
-    until = None
+    params = {
+        "max": 3000,
+        "variant": "standard",
+        "perfType": "standard",
+        "vs": ",".join(BOTS),
+        "pgnInJson": False,
+        "rated": "true",
+        "analysed": "false",
+        "opening": "false",
+        "clocks": "false",
+        "evals": "false"
+    }
 
-    while True:
-        params = {
-            "max": 3000,
-            "variant": "standard",
-            "perfType": "standard",
-            "rated": "true",
-            "analysed": "false",
-            "opening": "false",
-            "clocks": "false",
-            "evals": "false"
-        }
-        if until:
-            params["until"] = until
+    print(f"Fetching games for {bot}...")
+    response = requests.get(url, headers=headers, params=params)
+    if response.status_code != 200:
+        print(f"  Failed for {bot} - {response.status_code}")
+        return ""
 
-        print(f"Fetching games for {bot} (until={until})...")
-        response = requests.get(url, headers=headers, params=params)
-        if response.status_code != 200:
-            print(f"  Failed for {bot} - {response.status_code}")
-            break
-
-        text = response.text.strip()
-        print(f"  Fetched {len(text)} characters for {bot}")
-
-        if not text:
-            break
-
-        all_pgn += "\n\n\n" + text if all_pgn else text
-
-        next_until = response.headers.get("X-Next-Until")
-        if not next_until or next_until == until:
-            break
-        until = next_until
-
-        time.sleep(2)  
-
-    return all_pgn
+    return response.text
 
 def filter_games(pgn_data):
     games = pgn_data.strip().split("\n\n\n")
@@ -61,11 +54,10 @@ def filter_games(pgn_data):
     for game in games:
         lines = game.split("\n")
         tags = {line.split(" ")[0][1:]: line for line in lines if line.startswith("[")}
-        
-        variant_tag = tags.get("Variant", "")
-        if variant_tag and variant_tag.lower() != "standard":
+        if "[Variant \"Chess960\"]" not in tags.get("Variant", ""):
             continue
-        
+        white = tags.get("White", "")
+        black = tags.get("Black", "")
         w_rating_line = tags.get("WhiteElo", "")
         b_rating_line = tags.get("BlackElo", "")
         w_prov = "WhiteRatingDiff" not in tags
@@ -89,7 +81,7 @@ def main():
     all_games = []
     for bot in BOTS:
         pgn_data = fetch_full_games(bot)
-        time.sleep(2)
+        time.sleep(2)  # rate limit
         filtered = filter_games(pgn_data)
         print(f"  → {len(filtered)} valid games for {bot}")
         all_games.extend(filtered)
