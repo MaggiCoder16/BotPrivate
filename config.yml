@@ -81,16 +81,15 @@ opening_books:
   priority: 400
   books:
     standard_white:
-      selection: best_move
+      selection: weighted_random
       names:
         - Optimus2502
         - Optimus4
 
     standard_black:
-      selection: best_move
+      selection: weighted_random
       names:
-        - Optimus2502
-        - Optimus4
+        - BlackBook
 
     standard_white_tournament:
       selection: best_move
