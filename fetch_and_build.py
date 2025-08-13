@@ -15,7 +15,7 @@ BOTS = [
     "Sooraj_Kumar_P_S"
 ]
 
-OUTPUT_PGN = "filtered_standard_bots_2200plus.pgn"
+OUTPUT_PGN = "filtered_960_bots_2200plus.pgn"
 
 def fetch_full_games(bot):
     url = f"https://lichess.org/api/games/user/{bot}"
